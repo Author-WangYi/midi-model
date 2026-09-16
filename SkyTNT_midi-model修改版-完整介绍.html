@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>midi-model 便携版 · 使用说明</title>
+<style>
+  :root{
+    --bg:#f4f6fb; --card:#ffffff; --line:#e4e8f1; --line2:#eef1f7;
+    --ink:#1a2130; --ink2:#5b6478; --ink3:#8d96a8;
+    --main:#4f46e5; --main-soft:#eef0fe; --main-deep:#3730a3;
+    --cpu:#0e7c86; --cpu-soft:#e6f6f7;
+    --gpu:#7c3aed; --gpu-soft:#f3ecfe;
+    --ok:#15803d; --ok-soft:#e9f7ee;
+    --warn:#b45309; --warn-soft:#fdf5e6;
+    --bad:#b91c1c; --bad-soft:#fdeced;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei","PingFang SC","Hiragino Sans GB",sans-serif;
+    font-size:15px; line-height:1.75;
+  }
+  .wrap{max-width:920px; margin:0 auto; padding:0 20px 72px}
+
+  /* ---------- 顶部 ---------- */
+  .hero{
+    position:relative; overflow:hidden;
+    background:linear-gradient(160deg,#ffffff 0%,#f7f8ff 55%,#f1f0ff 100%);
+    border-bottom:1px solid var(--line);
+    padding:52px 20px 44px; margin-bottom:36px;
+  }
+  .hero::before,.hero::after{
+    content:""; position:absolute; border-radius:50%; pointer-events:none;
+  }
+  .hero::before{
+    width:420px;height:420px; right:-140px; top:-190px;
+    background:radial-gradient(circle,rgba(124,58,237,.16),rgba(124,58,237,0) 68%);
+  }
+  .hero::after{
+    width:360px;height:360px; left:-130px; bottom:-200px;
+    background:radial-gradient(circle,rgba(13,148,136,.14),rgba(13,148,136,0) 68%);
+  }
+  .hero-inner{max-width:880px; margin:0 auto; position:relative}
+  .kicker{
+    display:inline-block; font-size:12px; letter-spacing:.14em;
+    color:var(--main); background:var(--main-soft);
+    border:1px solid #dfe2fb; border-radius:999px;
+    padding:4px 13px; margin-bottom:18px; font-weight:600;
+  }
+  h1{
+    margin:0 0 12px; font-size:38px; line-height:1.25; letter-spacing:-.02em;
+    font-weight:750;
+  }
+  h1 small{display:block; font-size:17px; font-weight:500; color:var(--ink2); margin-top:10px; letter-spacing:0}
+  .badges{display:flex; flex-wrap:wrap; gap:8px; margin-top:22px}
+  .badge{
+    font-size:13px; padding:6px 13px; border-radius:8px;
+    background:rgba(255,255,255,.9); border:1px solid var(--line);
+    color:var(--ink2); font-weight:500;
+    box-shadow:0 1px 2px rgba(20,30,60,.03);
+  }
+  .badge b{color:var(--main); font-weight:700}
+
+  /* ---------- 通用区块 ---------- */
+  section{margin-bottom:40px}
+  h2{
+    font-size:22px; margin:0 0 6px; font-weight:700; letter-spacing:-.01em;
+    display:flex; align-items:center; gap:11px;
+  }
+  h2 .num{
+    flex:0 0 auto; width:27px; height:27px; border-radius:8px;
+    background:var(--main); color:#fff; font-size:14px; font-weight:700;
+    display:inline-flex; align-items:center; justify-content:center;
+  }
+  .lead{color:var(--ink2); margin:0 0 20px; padding-left:38px}
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:24px 26px; box-shadow:0 1px 3px rgba(20,30,60,.04);
+  }
+  .card + .card{margin-top:14px}
+
+  /* ---------- 表格 ---------- */
+  .tbl{width:100%; border-collapse:collapse; font-size:14px}
+  .tbl th,.tbl td{padding:11px 14px; text-align:left; border-bottom:1px solid var(--line2); vertical-align:top}
+  .tbl th{background:#fafbfe; font-weight:650; color:var(--ink2); font-size:13px; white-space:nowrap}
+  .tbl tr:last-child td{border-bottom:none}
+  .tbl td:first-child{font-weight:600; white-space:nowrap}
+  .tbl .r{text-align:right}
+  .muted{color:var(--ink3)}
+  .yes{color:var(--ok); font-weight:700}
+  .no{color:var(--bad); font-weight:700}
+
+  /* ---------- 对比双栏 ---------- */
+  .two{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+  @media(max-width:720px){ .two{grid-template-columns:1fr} }
+  .pane{border:1px solid var(--line); border-radius:14px; padding:20px 22px; background:#fff}
+  .pane.before{background:#fcfcfd}
+  .pane h3{margin:0 0 14px; font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px}
+  .dot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+  .pane ul{margin:0; padding-left:20px}
+  .pane li{margin-bottom:9px; font-size:14px; color:var(--ink2)}
+  .pane li:last-child{margin-bottom:0}
+  .pane li b{color:var(--ink)}
+  .tag{
+    display:inline-block; font-size:11px; font-weight:700; padding:2px 8px;
+    border-radius:5px; margin-right:6px; vertical-align:1px;
+  }
+  .tag.bad{background:var(--bad-soft); color:var(--bad)}
+  .tag.ok{background:var(--ok-soft); color:var(--ok)}
+
+  /* ---------- 流程 ---------- */
+  .flow{display:flex; align-items:stretch; gap:0; flex-wrap:wrap; margin:4px 0 0}
+  .step{
+    flex:1 1 0; min-width:150px; text-align:center; padding:16px 10px;
+    background:#fafbfe; border:1px solid var(--line2); border-radius:12px; margin:4px;
+  }
+  .step .ico{
+    width:34px;height:34px;margin:0 auto 9px;border-radius:9px;
+    background:var(--main-soft); color:var(--main-deep);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:800; font-size:15px;
+  }
+  .step .t{font-weight:650; font-size:14px; margin-bottom:3px}
+  .step .d{font-size:12.5px; color:var(--ink3); line-height:1.55}
+
+  /* ---------- 版本卡片 ---------- */
+  .picks{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px}
+  @media(max-width:720px){ .picks{grid-template-columns:1fr} }
+  .pick{border:1px solid var(--line); border-radius:14px; background:#fff; overflow:hidden}
+  .pick .top{padding:16px 22px 14px; border-bottom:1px solid var(--line2)}
+  .pick.cpu .top{background:linear-gradient(135deg,var(--cpu-soft),#fff)}
+  .pick.gpu .top{background:linear-gradient(135deg,var(--gpu-soft),#fff)}
+  .pick .name{font-size:17px; font-weight:750; display:flex; align-items:center; gap:9px}
+  .pick.cpu .name{color:var(--cpu)}
+  .pick.gpu .name{color:var(--gpu)}
+  .pick .sub{font-size:13px; color:var(--ink3); margin-top:3px}
+  .pick .body{padding:16px 22px 20px}
+  .pick dl{margin:0; font-size:13.5px}
+  .pick dt{color:var(--ink3); font-size:12px; font-weight:600; margin-top:11px}
+  .pick dt:first-child{margin-top:0}
+  .pick dd{margin:2px 0 0; color:var(--ink)}
+  .verdict{
+    margin-top:16px; padding:11px 14px; border-radius:9px; font-size:13.5px;
+    background:#fafbfe; border:1px dashed var(--line); color:var(--ink2);
+  }
+  .verdict b{color:var(--ink)}
+
+  /* ---------- 条形图 ---------- */
+  .barrow{display:flex; align-items:center; gap:14px; margin-bottom:14px}
+  .barrow:last-child{margin-bottom:0}
+  .barlabel{flex:0 0 128px; font-size:13.5px; font-weight:650}
+  .bartrack{flex:1; height:30px; background:#f2f4f9; border-radius:7px; overflow:hidden; position:relative}
+  .barfill{height:100%; display:flex; align-items:center; padding-left:11px; color:#fff; font-size:13px; font-weight:700; border-radius:7px; min-width:70px}
+  .barfill.cpu{background:linear-gradient(90deg,#0e7c86,#14a3ae)}
+  .barfill.gpu{background:linear-gradient(90deg,#6d28d9,#a855f7)}
+  .barnote{font-size:12.5px; color:var(--ink3); margin-top:14px; padding-top:14px; border-top:1px solid var(--line2)}
+
+  /* ---------- 步骤 ---------- */
+  ol.steps{margin:0; padding:0; list-style:none; counter-reset:s}
+  ol.steps > li{
+    counter-increment:s; position:relative; padding:0 0 22px 46px;
+  }
+  ol.steps > li::before{
+    content:counter(s); position:absolute; left:0; top:1px;
+    width:28px;height:28px; border-radius:50%;
+    background:var(--main); color:#fff; font-size:13px; font-weight:700;
+    display:flex; align-items:center; justify-content:center;
+  }
+  ol.steps > li::after{
+    content:""; position:absolute; left:13.5px; top:34px; bottom:6px;
+    width:1px; background:var(--line);
+  }
+  ol.steps > li:last-child{padding-bottom:0}
+  ol.steps > li:last-child::after{display:none}
+  ol.steps .st{font-weight:650; margin-bottom:5px}
+  ol.steps .sd{font-size:14px; color:var(--ink2)}
+  code{
+    background:#f2f4f9; border:1px solid var(--line2); border-radius:5px;
+    padding:1px 6px; font-size:13px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Courier New",monospace;
+    color:#b3306b; word-break:break-all;
+  }
+  .path{
+    background:#1f2937; color:#e5e7eb; border-radius:9px; padding:12px 16px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:13px; line-height:1.7; margin:10px 0 0; overflow-x:auto;
+    border:none;
+  }
+  .path .c{color:#9ca3af}
+  .path .g{color:#7dd3a0}
+
+  /* ---------- 注意项 ---------- */
+  .notes{display:grid; gap:12px}
+  .note{
+    display:flex; gap:13px; padding:15px 18px; border-radius:12px;
+    background:#fff; border:1px solid var(--line); font-size:14px;
+  }
+  .note .mk{
+    flex:0 0 auto; font-size:11px; font-weight:800; letter-spacing:.04em;
+    padding:3px 9px; border-radius:6px; height:fit-content; margin-top:2px;
+    white-space:nowrap;
+  }
+  .note.must{background:#fffafa; border-color:#f6d9db}
+  .note.must .mk{background:var(--bad-soft); color:var(--bad)}
+  .note.tip .mk{background:var(--ok-soft); color:var(--ok)}
+  .note.warn .mk{background:var(--warn-soft); color:var(--warn)}
+  .note .tx{flex:1}
+  .note .tx b{color:var(--ink)}
+  .note .tx span{color:var(--ink2)}
+
+  /* ---------- 折叠 ---------- */
+  details{
+    background:#fff; border:1px solid var(--line); border-radius:12px;
+    margin-bottom:10px; overflow:hidden;
+  }
+  details[open]{box-shadow:0 1px 3px rgba(20,30,60,.04)}
+  summary{
+    padding:14px 20px; cursor:pointer; font-weight:650; font-size:14.5px;
+    list-style:none; display:flex; align-items:center; gap:10px;
+  }
+  summary::-webkit-details-marker{display:none}
+  summary::before{
+    content:""; width:6px;height:6px; border-right:2px solid var(--ink3);
+    border-bottom:2px solid var(--ink3); transform:rotate(-45deg);
+    transition:transform .18s; margin-left:2px; flex:0 0 auto;
+  }
+  details[open] summary::before{transform:rotate(45deg)}
+  details .inner{padding:0 20px 18px 20px; font-size:14px; color:var(--ink2); border-top:1px solid var(--line2); padding-top:16px}
+  details .inner p{margin:0 0 10px}
+  details .inner p:last-child{margin-bottom:0}
+
+  /* ---------- 页尾 ---------- */
+  footer{
+    border-top:1px solid var(--line); padding-top:26px; margin-top:8px;
+    font-size:13px; color:var(--ink3); line-height:1.9;
+  }
+  footer b{color:var(--ink2)}
+  a{color:var(--main); text-decoration:none; border-bottom:1px solid #c7cbf5}
+  a:hover{border-bottom-color:var(--main)}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="kicker">便携版 · 解压即用</div>
+    <h1>
+      midi-model 便携版
+      <small>用 AI 生成 MIDI 音乐的本地工具 —— 免安装、免配置、内置模型、离线可用</small>
+    </h1>
+    <div class="badges">
+      <div class="badge"><b>免安装</b> 解压就能跑</div>
+      <div class="badge"><b>免配置</b> 不用装 Python</div>
+      <div class="badge"><b>内置模型</b> 启动不联网</div>
+      <div class="badge"><b>可搬迁</b> 改名换盘都行</div>
+      <div class="badge"><b>本地运行</b> 数据不出电脑</div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- ============ 1 ============ -->
+  <section>
+    <h2><span class="num">1</span>这是什么</h2>
+    <p class="lead">一个跑在自己电脑上的 AI 作曲工具。你说要什么风格，它把音符一个个"写"出来，最后给你一份能直接用的 MIDI 文件。</p>
+
+    <div class="card">
+      <table class="tbl">
+        <tr>
+          <th style="width:110px">项目</th>
+          <th>说明</th>
+        </tr>
+        <tr>
+          <td>软件名称</td>
+          <td>Midi-Model（作者 SkyTNT，开源项目）</td>
+        </tr>
+        <tr>
+          <td>它做什么</td>
+          <td>生成 MIDI 音乐。它的核心是一个约 12 层的 Transformer 模型（LLaMA 架构），把 MIDI 里的音符、力度、乐器、速度等信息拆成 3406 种「词」，像语言模型写文章那样一个字一个字往下预测，拼成一段完整的曲子</td>
+        </tr>
+        <tr>
+          <td>怎么用</td>
+          <td>双击启动后，用浏览器打开一个本地网页界面，填好要求点生成，等几秒到几十秒</td>
+        </tr>
+        <tr>
+          <td>给什么</td>
+          <td>
+            <b>自定义提示</b>：指定乐器、鼓组、BPM、拍号、调号，让它从零开始编<br>
+            <b>MIDI 续写</b>：丢一个 MIDI 文件进去，它顺着往下写<br>
+            <b>接着上次</b>：在上一次的结果上继续延伸
+          </td>
+        </tr>
+        <tr>
+          <td>出什么</td>
+          <td>同时给你三样：MIDI 文件（可下载）、WAV 音频（可试听）、网页里滚动的乐谱可视化</td>
+        </tr>
+        <tr>
+          <td>一次几个</td>
+          <td>默认一次生成 <b>8 个方案</b>，挑选满意的那个</td>
+        </tr>
+        <tr>
+          <td>跑在哪</td>
+          <td>完全在你自己的电脑上运算，不上传任何东西，也不用注册账号</td>
+        </tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 2 ============ -->
+  <section>
+    <h2><span class="num">2</span>原版为什么不能直接双击，我改了什么</h2>
+    <p class="lead">作者发布的是"程序本体"，不是一个"成品软件"。解压后直接双击，通常只会看到一个黑窗口一闪而过。</p>
+
+    <div class="two" style="margin-bottom:16px">
+      <div class="pane before">
+        <h3><span class="dot" style="background:#cbd5e1"></span>原版：卡在三道门槛上</h3>
+        <ul>
+          <li><span class="tag bad">门槛一</span><b>要自己装 fluidsynth</b><br>这是合成声音用的底层库，官方只提供源码，得自己找 Windows 编译版，装完还要配环境变量。</li>
+          <li><span class="tag bad">门槛二</span><b>程序把路径写死了</b><br>程序内部固定去 <code>C:\tools\fluidsynth\bin</code> 找它。装在别的位置？直接崩溃退出，报 <code>FileNotFoundError</code>。</li>
+          <li><span class="tag bad">门槛三</span><b>模型要联网现下</b><br>第一次运行才去 HuggingFace 下载约 <b>990 MB</b> 的模型和音色库。国内网络下这一步经常超时失败，看起来就像"卡住了"。</li>
+        </ul>
+      </div>
+      <div class="pane">
+        <h3><span class="dot" style="background:#4f46e5"></span>便携版：这些都替你处理好了</h3>
+        <ul>
+          <li><span class="tag ok">已解决</span><b>fluidsynth 直接打包进文件夹</b><br>6 MB 的库文件已经躺在包里，不用你下载，也不用管环境变量。</li>
+          <li><span class="tag ok">已解决</span><b>用"自愈式启动器"绕过硬编码</b><br>每次启动自动在 C 盘维护一个几 KB 的目录链接，让程序以为库在它指定的位置。文件夹<b>改名、换盘、换电脑</b>都不用重配，启动器会自己修好。</li>
+          <li><span class="tag ok">已解决</span><b>模型和音色库预先放好</b><br>990 MB 的模型已随包提供，<b>启动和生成都不需要联网</b>。</li>
+          <li><span class="tag ok">额外清理</span><b>删掉了约 3 GB 的无用依赖</b><br>官方包里混入了一套用不上的深度学习运行库。实测确认程序实际用的是 ONNX Runtime 推理，于是把这堆 3 GB 的累赘清了出去。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin:0 0 16px; font-size:15px">使用体验对照</h3>
+      <table class="tbl">
+        <tr>
+          <th style="width:130px">环节</th>
+          <th style="width:38%">原版</th>
+          <th>便携版</th>
+        </tr>
+        <tr>
+          <td>环境准备</td>
+          <td class="muted">自己下载、安装、配置 fluidsynth</td>
+          <td><span class="yes">零配置</span>，库已在包内</td>
+        </tr>
+        <tr>
+          <td>存放位置</td>
+          <td class="muted">受限于写死的 C 盘路径</td>
+          <td><span class="yes">任意盘、任意文件夹名</span>，含空格也没问题</td>
+        </tr>
+        <tr>
+          <td>首次启动</td>
+          <td class="muted">联网下载约 990 MB，国内常失败</td>
+          <td><span class="yes">直接可用</span>，不下载任何东西</td>
+        </tr>
+        <tr>
+          <td>启动方式</td>
+          <td class="muted">命令行 <code>python app.py</code>，或双击后闪退</td>
+          <td><span class="yes">双击「启动.bat」</span>，浏览器自动打开</td>
+        </tr>
+        <tr>
+          <td>换台电脑</td>
+          <td class="muted">整蛊环境得重来一遍</td>
+          <td><span class="yes">复制文件夹过去就能用</span></td>
+        </tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ 3 ============ -->
+  <section>
+    <h2><span class="num">3</span>两个版本怎么选</h2>
+    <p class="lead">它们其实是<b>同一个程序</b>（界面、功能、模型完全一样），唯一的差别是"用谁来算"：一个是电脑的 CPU，一个是 NVIDIA 显卡。</p>
+
+    <div class="picks">
+      <div class="pick cpu">
+        <div class="top">
+          <div class="name">app</div>
+          <div class="sub">CPU 通用版 · 解压后约 1.24 GB</div>
+        </div>
+        <div class="body">
+          <dl>
+            <dt>靠什么算</dt>
+            <dd>处理器（CPU）</dd>
+            <dt>硬件要求</dt>
+            <dd>64 位 Windows，没有其他要求</dd>
+            <dt>速度</dt>
+            <dd>约 9.6 个音符/秒</dd>
+            <dt>适合</dt>
+            <dd>没有独立显卡的电脑、要拷给别人的场景</dd>
+          </dl>
+          <div class="verdict"><b>一句话：</b>哪台电脑都能跑，就是慢一点。</div>
+        </div>
+      </div>
+
+      <div class="pick gpu">
+        <div class="top">
+          <div class="name">app-gpu</div>
+          <div class="sub">显卡加速版 · 解压后约 3.02 GB</div>
+        </div>
+        <div class="body">
+          <dl>
+            <dt>靠什么算</dt>
+            <dd>NVIDIA 独立显卡（CUDA）</dd>
+            <dt>硬件要求</dt>
+            <dd><b>必须</b>是 NVIDIA 显卡，且驱动版本较新</dd>
+            <dt>速度</dt>
+            <dd>约 48.3 个音符/秒，<b>约为 CPU 版的 5 倍</b></dd>
+            <dt>适合</dt>
+            <dd>有 N 卡的自己人自用、追求效率</dd>
+          </dl>
+          <div class="verdict"><b>一句话：</b>快 5 倍，但没 N 卡就跑不起来。</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin:0 0 18px; font-size:15px">实测速度对比（生成 64 个音符事件）</h3>
+
+      <div class="barrow">
+        <div class="barlabel">app（CPU）</div>
+        <div class="bartrack"><div class="barfill cpu" style="width:14%">6.70 秒</div></div>
+      </div>
+      <div class="barrow">
+        <div class="barlabel">app-gpu（显卡）</div>
+        <div class="bartrack"><div class="barfill gpu" style="width:82%">1.33 秒</div></div>
+      </div>
+
+      <div class="barnote">
+        在 RTX 4060 Ti 上实测，同一台电脑、同一个模型、同样的参数。显卡版本快约 <b>5 倍</b>；生成的内容越长、一次要的方案越多，差距越大。
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <h3 style="margin:0 0 12px; font-size:15px">到底选哪个？</h3>
+      <p style="margin:0 0 10px; color:var(--ink2); font-size:14px">
+        先开一个命令行窗口，敲 <code>nvidia-smi</code> 回车。
+      </p>
+      <table class="tbl">
+        <tr>
+          <th style="width:280px">你看到的结果</th>
+          <th>选它</th>
+        </tr>
+        <tr>
+          <td>列出了显卡型号和 <code>CUDA Version: 12.x</code> 之类</td>
+          <td><b style="color:var(--gpu)">app-gpu</b>，享受 5 倍速度</td>
+        </tr>
+        <tr>
+          <td>提示"不是内部或外部命令"、或报错</td>
+          <td><b style="color:var(--cpu)">app</b>，稳妥好用</td>
+        </tr>
+        <tr>
+          <td>想拷给朋友的电脑用 / 到处带着走</td>
+          <td><b style="color:var(--cpu)">app</b>，因为对方的电脑不一定有 N 卡</td>
+        </tr>
+      </table>
+      <p style="margin:14px 0 0; font-size:13.5px; color:var(--ink3)">
+        拿不定主意？<b style="color:var(--ink2)">先下 app</b>。它一定能跑起来，用着觉得慢再换 app-gpu 也不迟。
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ 4 ============ -->
+  <section>
+    <h2><span class="num">4</span>三分钟用起来</h2>
+    <p class="lead">不需要装任何东西，不需要命令行基础。</p>
+
+    <div class="card">
+      <ol class="steps">
+        <li>
+          <div class="st">解压到一个你喜欢的文件夹</div>
+          <div class="sd">放 D 盘、E 盘、桌面都行，文件夹名字随便改，路径里有空格也没关系。<b>建议不要放在 C 盘</b>（省点系统盘空间）。</div>
+        </li>
+        <li>
+          <div class="st">双击文件夹里的「启动.bat」</div>
+          <div class="sd">
+            会出现一个黑色窗口，滚动一段文字后卡住不动——这是正常的，说明服务已经在运行。
+            <div class="path"><span class="c">rem 你会看到类似这样的提示：</span>
+    ----------------------------------------
+       midi-model   便携版
+       浏览器会自动打开：http://127.0.0.1:7860
+       关闭这个黑窗口 = 关闭程序
+    ----------------------------------------</div>
+          </div>
+        </li>
+        <li>
+          <div class="st">浏览器自动打开操作界面</div>
+          <div class="sd">如果没有自动打开，自己开浏览器访问 <code>http://127.0.0.1:7860</code>。首次进入需要等模型加载，会有几十秒的等待。</div>
+        </li>
+        <li>
+          <div class="st">点生成，等结果</div>
+          <div class="sd">在网页里选好乐器、速度、调式等，点生成按钮。等几秒到几十秒，页面上会出现乐谱图、试听音频和 MIDI 下载。</div>
+        </li>
+        <li>
+          <div class="st">去 outputs 文件夹拿成品</div>
+          <div class="sd">
+            生成的 MIDI 会自动存到程序目录下的 <code>outputs</code> 文件夹：
+            <div class="path">outputs\
+    <span class="g">output1.mid</span>
+    <span class="g">output2.mid</span>
+    <span class="c">... 一直到</span>
+    <span class="g">output8.mid</span></div>
+            <b>注意：</b>文件名是固定的，下一次生成会覆盖上一次。满意的作品记得第一时间改名或另存到别处。
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ 5 ============ -->
+  <section>
+    <h2><span class="num">5</span>用之前必须知道的几件事</h2>
+    <p class="lead">都是实测踩出来的，看完能省很多麻烦。</p>
+
+    <div class="notes">
+      <div class="note must">
+        <span class="mk">必须</span>
+        <div class="tx">
+          <b>只能双击「启动.bat」，不要直接双击 app.exe。</b>
+          <span>直接开 exe 会闪退。启动器负责把环境准备好再拉起程序，绕不过去。</span>
+        </div>
+      </div>
+
+      <div class="note must">
+        <span class="mk">必须</span>
+        <div class="tx">
+          <b>关掉那个黑色窗口，就是关掉程序。</b>
+          <span>程序不会在后台偷偷驻留，也不会开机自启。想彻底退出，关黑窗口即可；浏览器页面可以直接叉掉，不影响。</span>
+        </div>
+      </div>
+
+      <div class="note warn">
+        <span class="mk">注意</span>
+        <div class="tx">
+          <b>第一次运行如果提示"无法建立目录链接"，改用管理员身份运行。</b>
+          <span>程序需要在 C 盘建一个文件夹来"骗过"它内部写死的路径。多数情况下直接双击就行；万一 Windows 权限拦住了，右键 启动.bat → 以管理员身份运行，成功一次以后就正常了。</span>
+        </div>
+      </div>
+
+      <div class="note warn">
+        <span class="mk">注意</span>
+        <div class="tx">
+          <b>C 盘会留下一个几 KB 的目录链接，这是正常的，也不是"安装"。</b>
+          <span>位置是 <code>C:\tools\fluidsynth</code>。它只是个指路牌，指向你解压出来的文件夹，本身不占空间、不写注册表、不装运行库。删掉也没关系，下次启动会自动重建。但<b>程序运行期间需要它存在</b>。</span>
+        </div>
+      </div>
+
+      <div class="note warn">
+        <span class="mk">注意</span>
+        <div class="tx">
+          <b>如果装了 360 之类带"c 盘搬家"的安全软件，可能干扰这个链接。</b>
+          <span>实测发现这类软件会把 <code>C:\tools\fluidsynth</code> 悄悄挪到自己的目录下。如果遇到启动异常或链接反复失效，把程序所在文件夹加入安全软件白名单，或者临时退出它再启动。</span>
+        </div>
+      </div>
+
+      <div class="note tip">
+        <span class="mk">放心</span>
+        <div class="tx">
+          <b>全程不需要联网。</b>
+          <span>模型和音色库已经打包在里面（约 990 MB），启动、生成、试听都在本地完成，不下载任何东西，也不上传你的音乐。断网也能用。</span>
+        </div>
+      </div>
+
+      <div class="note tip">
+        <span class="mk">放心</span>
+        <div class="tx">
+          <b>文件夹可以随便改名、随便搬家。</b>
+          <span>换盘符、改文件夹名、拷到 U 盘带到别的电脑，都不需要重新配置任何东西。只有启动器里一个自动维护的链接会跟着变，你什么都不用做。</span>
+        </div>
+      </div>
+
+      <div class="note tip">
+        <span class="mk">放心</span>
+        <div class="tx">
+          <b>杀毒软件报警大概率是误报。</b>
+          <span>这类用 PyInstaller 打包的程序被误报是常见现象。加信任即可。有条件的话，建议从官方渠道下载后自行核对压缩包。</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 6 ============ -->
+  <section>
+    <h2><span class="num">6</span>常见问题</h2>
+
+    <details open>
+      <summary>双击后黑窗口一闪就没了 / 什么都没发生</summary>
+      <div class="inner">
+        <p>百分之九十是因为直接双击了 <code>app.exe</code>。请确认双击的是 <b>启动.bat</b>。</p>
+        <p>如果确实是双击启动.bat 还是闪退，说明文件解压不完整。建议用 7-Zip 或 WinRAR 重新完整解压一遍，别只解压一部分。</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>黑窗口停住了，光标不闪，是不是卡死了？</summary>
+      <div class="inner">
+        <p>不是。模型加载和推理都是"闷着头干活"，中间没有输出。这时打开浏览器访问 <code>http://127.0.0.1:7860</code> 就能看到界面。</p>
+        <p>首次启动、以及第一次生成时，等待时间会明显长一些（模型要读进内存或显存），之后就快了。</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>浏览器打不开 / 提示无法访问</summary>
+      <div class="inner">
+        <p>先确认黑窗口还在（关掉就等于关程序了）。然后手动访问 <code>http://127.0.0.1:7860</code>。</p>
+        <p>如果提示端口被占用，说明 7860 这个端口被别的程序（可能是另一个 AI 工具、或另一个副本）占了。关掉它，或者一次只开一个副本。</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>显卡版启动报错 / 提示找不到 CUDA</summary>
+      <div class="inner">
+        <p>显卡版要求 NVIDIA 显卡 + 较新的驱动。请先去 NVIDIA 官网更新显卡驱动，重启后再试。</p>
+        <p>如果显卡型号比较老（例如早期的 GT 系列、低端 MX 系列），可能本身就不被支持，这种情况请改用 CPU 版 <b>app</b>，功能完全一样，只是慢一些。</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>生成的曲子很短 / 听起来不完整</summary>
+      <div class="inner">
+        <p>默认只生成 2048 个音符事件，这是长度限制，可以在界面里把"generate max n midi events"调大。</p>
+        <p>另外，一次会出 8 个方案，质量参差不齐是正常的——挑好的用就行。也可以把「接着上次」用起来，一段一段往下接。</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>两个版本能同时开着吗？</summary>
+      <div class="inner">
+        <p>技术上可以，但它们共用同一个 C 盘链接，所以链接只会指向"最后一次启动"的那个副本。程序本身能正常跑，只是因为底层依赖完全相同，不会出问题。</p>
+        <p>不过为了省心、也为了少占内存和显存，<b>建议一次只开一个</b>。</p>
+      </div>
+    </details>
+
+    <details>
+      <summary>能删掉包里的东西给它"瘦身"吗？</summary>
+      <div class="inner">
+        <p>不要删 <code>_internal</code> 文件夹，那里是程序本体，删了就再也打不开了。</p>
+        <p><code>models</code> 文件夹和 <code>soundfont.sf2</code> 是模型与音色库（约 990 MB）。删掉后程序会尝试联网重新下载，国内网络下大概率失败，所以也别删。</p>
+        <p><code>outputs</code> 文件夹里是你自己生成的作品，可以随时清理。</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ 7 ============ -->
+  <section>
+    <h2><span class="num">7</span>配置要求</h2>
+    <div class="card">
+      <table class="tbl">
+        <tr>
+          <th style="width:130px">项目</th>
+          <th>要求</th>
+        </tr>
+        <tr>
+          <td>系统</td>
+          <td>64 位 Windows（Windows 10 / 11 均可）</td>
+        </tr>
+        <tr>
+          <td>显卡</td>
+          <td>CPU 版：无要求<br>显卡版：NVIDIA 显卡 + 较新的驱动</td>
+        </tr>
+        <tr>
+          <td>磁盘空间</td>
+          <td>CPU 版约 1.24 GB，显卡版约 3.02 GB（解压后）</td>
+        </tr>
+        <tr>
+          <td>内存</td>
+          <td>建议 8 GB 以上</td>
+        </tr>
+        <tr>
+          <td>网络</td>
+          <td>不需要。首次使用、后续使用都不需要联网</td>
+        </tr>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <p>
+      <b>关于这个包</b><br>
+      本便携版基于开源项目 <b>Midi-Model</b>（作者 SkyTNT）的官方 Windows 发布包改造而成。
+      程序本身的版权与许可遵循原项目，请遵守原作者的授权条款；本包仅做了便携化封装，未修改程序功能。
+    </p>
+    <p>
+      <b>改造内容</b><br>
+      内置 fluidsynth 运行库 · 自愈式启动器（解决硬编码路径与搬迁问题）· 预置模型与音色库（离线可用）· 清理冗余依赖
+    </p>
+    <p style="margin-top:18px; color:#a5adbd">
+      遇到问题请先看上面的常见问题；仍未解决，请附上黑色窗口里的完整文字反馈。
+    </p>
+  </footer>
+
+</div>
+
+</body>
+</html>

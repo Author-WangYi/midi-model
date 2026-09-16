@@ -1,49 +1,6 @@
-# Midi-Model
-
-## Midi event transformer for music generation
-
-![](./banner.png)
-
-## Updates
-- v1.3: MIDITokenizerV2 and new MidiVisualizer
-- v1.2 : Optimise the tokenizer and dataset. The dataset was filtered by MIDITokenizer.check_quality. Using the higher quality dataset to train the model, the performance of the model is significantly improved.
-
-## Demo
-
-- [online: huggingface](https://huggingface.co/spaces/skytnt/midi-composer)
-
-- [online: colab](https://colab.research.google.com/github/SkyTNT/midi-model/blob/main/demo.ipynb)
-
-- [download windows app](https://github.com/SkyTNT/midi-model/releases)
-
-## Pretrained model
-
-[huggingface](https://huggingface.co/skytnt/midi-model-tv2o-medium)
-
-## Dataset
-
-[projectlosangeles/Los-Angeles-MIDI-Dataset](https://huggingface.co/datasets/projectlosangeles/Los-Angeles-MIDI-Dataset)
-
-## Requirements
-
-- install [pytorch](https://pytorch.org/)(recommend pytorch>=2.0)
-- install [fluidsynth](https://www.fluidsynth.org/)>=2.0.0
-- `pip install -r requirements.txt`
-
-## Run app
-
-`python app.py`
-
-## Train 
-
-`python train.py`
- 
-## Citation
-
-```bibtex
-@misc{skytnt2024midimodel,
-  author = {SkyTNT},
-  title = {Midi Model: Midi event transformer for symbolic music generation},
-  year = {2024},
-  howpublished = {\url{https://github.com/SkyTNT/midi-model}},
-}
+该软件来自于开源项目：https://github.com/SkyTNT/midi-model
+基于该项目的release包（v1.3.5）修改而来，修改者：Author王异。
+使用工具：Workbuddy、Deepseek-V4.1-Flash。
+软件已内置一个最基础的default模型，使用时若选择了其它模型，则会尝试连接huggingface进行下载。
+也可在Author王异分享的网盘链接中免梯子下载其它模型。
+启动时不要使用原本的 app.exe，请使用 启动.bat。
