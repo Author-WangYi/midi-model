@@ -9,3 +9,5 @@
 也可在Author王异分享的网盘链接中免梯子下载其它模型。
 
 启动时不要使用原本的 app.exe，请使用 启动.bat。
+
+也可前往网盘下载：https://pan.quark.cn/s/fa97e1f1eb90
