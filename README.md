@@ -1,3 +1,5 @@
+# 可以直接使用的一键便携包！
+
 该软件来自于开源项目：https://github.com/SkyTNT/midi-model
 
 基于该项目的release包（v1.3.5）修改而来，修改者：Author王异。
